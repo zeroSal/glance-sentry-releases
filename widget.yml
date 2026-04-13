@@ -1,0 +1,71 @@
+- type: custom-api
+  title: Sentry Releases
+  cache: 15m
+  url: "http://${GLANCE_SENTRY_HOST}:${GLANCE_SENTRY_PORT}/"
+  template: |
+    {{ $fetchedAt := .JSON.String "fetchedAt" }}
+    {{ $projects  := .JSON.Array  "projects"  }}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+
+      <div style="display:flex;align-items:center;gap:10px;color:var(--color-text-tertiary);">
+        <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/sentry-light.svg" style="width:15px;height:15px;flex-shrink:0;" />
+        <span style="font-size:15px;color:var(--color-text-secondary);">
+          {{ len $projects }} project{{ if gt (len $projects) 1 }}s{{ end }} monitored
+        </span>
+      </div>
+      <span style="font-size:13px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums;">
+        updated {{ $fetchedAt }}
+      </span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+    {{ range $projects }}
+      {{ $name    := .String "name"                }}
+      {{ $ver     := .String "release.version"     }}
+      {{ $fullVer := .String "release.fullVersion" }}
+      {{ $adopt   := .Float  "release.adoption"    }}
+      {{ $issues  := .Int    "release.newGroups"   }}
+      {{ $date    := .String "release.dateCreated" }}
+      {{ $bar := $adopt }}
+      {{ if gt $bar 100.0 }}{{ $bar = 100.0 }}{{ end }}
+      <a href="https://sentry.io/organizations/${SENTRY_ORG}/releases/{{ $fullVer }}/"
+         target="_blank" rel="noreferrer"
+         style="display:flex;flex-direction:column;text-decoration:none;
+                background:var(--color-background-primary);
+                border:0.5px solid var(--color-border-tertiary);
+                border-radius:10px;overflow:hidden;">
+        <div style="padding:8px 11px 7px;
+                    border-bottom:0.5px solid var(--color-border-tertiary);
+                    font-size:13px;font-weight:500;
+                    color:var(--color-text-secondary);
+                    text-transform:uppercase;letter-spacing:.05em;
+                    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+             title="{{ $name }}">
+          {{ $name }}
+        </div>
+        <div style="padding:9px 11px 10px;display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);
+                      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+               title="{{ $fullVer }}">
+            {{ $ver }}
+          </div>
+          <div>
+            <div style="height:3px;border-radius:2px;overflow:hidden;margin-bottom:4px;
+                        background:var(--color-border-tertiary);">
+              <div style="height:100%;border-radius:2px;background:#6C5FC7;
+                          width:{{ printf "%.0f" $bar }}%;"></div>
+            </div>
+            <div style="font-size:13px;color:var(--color-text-secondary);">
+              {{ printf "%.1f" $adopt }}% adoption
+            </div>
+          </div>
+          {{ if gt $issues 0 }}
+          <div style="font-size:13px;font-weight:500;color:#E24B4A;">
+            +{{ $issues }} issues
+          </div>
+          {{ end }}
+          <div style="font-size:13px;color:var(--color-text-tertiary);"
+               {{ $date | parseRelativeTime "2006-01-02T15:04:05.999999Z" }}></div>
+        </div>
+      </a>
+    {{ end }}
+    </div>

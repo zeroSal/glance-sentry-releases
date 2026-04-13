@@ -24,7 +24,7 @@ jobs:
           CHANNEL: release
         run: |
           mkdir -p build
-          make build
+          VERSION=${VERSION#v} make build
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

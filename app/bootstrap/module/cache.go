@@ -22,8 +22,7 @@ var CacheModule = fx.Module("cache",
 		log.Info(fmt.Sprintf("Cache interval: %d minutes", env.CacheIntervalMinutes))
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				log.Info("Starting cache fetcher in background...")
-				go c.Start(ctx)
+				go c.Start(context.Background())
 				log.Success("HTTP server ready on " + env.GetProxyAddr())
 				go func() {
 					http.HandleFunc("/", createHandler(c, log))

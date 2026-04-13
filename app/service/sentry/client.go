@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"glance-sentry-releases/app/model/release"
 )
@@ -14,12 +15,16 @@ var _ ClientInterface = (*Client)(nil)
 type Client struct {
 	sentryOrg   string
 	sentryToken string
+	httpClient  *http.Client
 }
 
 func NewClient(sentryOrg, sentryToken string) *Client {
 	return &Client{
 		sentryOrg:   sentryOrg,
 		sentryToken: sentryToken,
+		httpClient: &http.Client{
+			Timeout: 30 * time.Second,
+		},
 	}
 }
 
@@ -47,7 +52,7 @@ func (c *Client) get(path string, out any) error {
 	}
 	req.Header.Set("Authorization", "Bearer "+c.sentryToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}

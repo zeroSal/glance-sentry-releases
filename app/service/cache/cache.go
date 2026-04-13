@@ -56,6 +56,8 @@ func (c *Cache) Start(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
+			log := c.log
+			log.Info("Running scheduled cache refresh...")
 			c.fetch(context.Background())
 		case <-c.stopChan:
 			return
@@ -92,10 +94,10 @@ func (c *Cache) fetch(ctx context.Context) {
 		c.fetchErr = err
 		if c.data == nil {
 			c.data = &release.Response{
-				FetchedAt: time.Now().Format("15:04"),
-				Projects:  []release.ProjectOut{},
+				Projects: []release.ProjectOut{},
 			}
 		}
+		c.data.FetchedAt = time.Now().Format("15:04")
 		c.mu.Unlock()
 		c.log.Error("Failed to fetch projects: " + err.Error())
 		c.log.Warn("Will retry in 5s, using stale/empty cache")
@@ -104,10 +106,12 @@ func (c *Cache) fetch(ctx context.Context) {
 
 	if len(projects) == 0 {
 		c.mu.Lock()
-		c.data = &release.Response{
-			FetchedAt: time.Now().Format("15:04"),
-			Projects:  []release.ProjectOut{},
+		if c.data == nil {
+			c.data = &release.Response{
+				Projects: []release.ProjectOut{},
+			}
 		}
+		c.data.FetchedAt = time.Now().Format("15:04")
 		c.fetchErr = nil
 		c.fetchAt = time.Now()
 		c.mu.Unlock()
@@ -161,10 +165,12 @@ func (c *Cache) fetch(ctx context.Context) {
 
 	if len(result) == 0 {
 		c.mu.Lock()
-		c.data = &release.Response{
-			FetchedAt: time.Now().Format("15:04"),
-			Projects:  []release.ProjectOut{},
+		if c.data == nil {
+			c.data = &release.Response{
+				Projects: []release.ProjectOut{},
+			}
 		}
+		c.data.FetchedAt = time.Now().Format("15:04")
 		c.fetchErr = fmt.Errorf("no projects with releases found")
 		c.mu.Unlock()
 		c.log.Warn("No projects with valid releases found")
@@ -172,10 +178,11 @@ func (c *Cache) fetch(ctx context.Context) {
 	}
 
 	c.mu.Lock()
-	c.data = &release.Response{
-		FetchedAt: time.Now().Format("15:04"),
-		Projects:  result,
+	if c.data == nil {
+		c.data = &release.Response{}
 	}
+	c.data.FetchedAt = time.Now().Format("15:04")
+	c.data.Projects = result
 	c.fetchErr = nil
 	c.fetchAt = time.Now()
 	c.mu.Unlock()

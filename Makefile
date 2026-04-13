@@ -22,36 +22,36 @@ go-mod-vendor: go-mod-tidy
 build-linux-amd64:
 	@echo "[*] Building Linux amd64..."
 	BUILD_DATE=$$(date -u +%Y-%m-%d); \
-	GOOS=linux GOARCH=amd64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$$VERSION -X main.Channel=$$CHANNEL -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$$VERSION-$$CHANNEL-linux-amd64 main.go
+	GOOS=linux GOARCH=amd64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$(VERSION) -X main.Channel=$(CHANNEL) -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$(VERSION)-$(CHANNEL)-linux-amd64 main.go
 
 build-linux-arm64:
 	@echo "[*] Building Linux arm64..."
 	BUILD_DATE=$$(date -u +%Y-%m-%d); \
-	GOOS=linux GOARCH=arm64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$$VERSION -X main.Channel=$$CHANNEL -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$$VERSION-$$CHANNEL-linux-arm64 main.go
+	GOOS=linux GOARCH=arm64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$(VERSION) -X main.Channel=$(CHANNEL) -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$(VERSION)-$(CHANNEL)-linux-arm64 main.go
 
 build-darwin-amd64:
 	@echo "[*] Building Darwin amd64..."
 	BUILD_DATE=$$(date -u +%Y-%m-%d); \
-	GOOS=darwin GOARCH=amd64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$$VERSION -X main.Channel=$$CHANNEL -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$$VERSION-$$CHANNEL-darwin-amd64 main.go
+	GOOS=darwin GOARCH=amd64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$(VERSION) -X main.Channel=$(CHANNEL) -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$(VERSION)-$(CHANNEL)-darwin-amd64 main.go
 
 build-darwin-arm64:
 	@echo "[*] Building Darwin arm64..."
 	BUILD_DATE=$$(date -u +%Y-%m-%d); \
-	GOOS=darwin GOARCH=arm64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$$VERSION -X main.Channel=$$CHANNEL -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$$VERSION-$$CHANNEL-darwin-arm64 main.go
+	GOOS=darwin GOARCH=arm64 GOFLAGS="-mod=vendor" go build -trimpath -ldflags "-s -w -X main.Version=$(VERSION) -X main.Channel=$(CHANNEL) -X main.BuildDate=$$BUILD_DATE" -o $(BUILD_DIR)/$(BINARY_NAME)-$(VERSION)-$(CHANNEL)-darwin-arm64 main.go
 
 build: go-mod-vendor
-	ifndef VERSION
-		$(error VERSION environment variable not set)
-	endif
-	ifndef CHANNEL
-		$(error CHANNEL environment variable not set)
-	endif
-		@echo "[*] Building production version $$VERSION-$$CHANNEL..."
-		$(MAKE) build-linux-amd64
-		$(MAKE) build-linux-arm64
-		$(MAKE) build-darwin-amd64
-		$(MAKE) build-darwin-arm64
-		@echo "[*] All builds done"
+ifndef VERSION
+	$(error VERSION environment variable not set)
+endif
+ifndef CHANNEL
+	$(error CHANNEL environment variable not set)
+endif
+	@echo "[*] Building production version $(VERSION)-$(CHANNEL)..."
+	$(MAKE) build-linux-amd64 VERSION=$(VERSION) CHANNEL=$(CHANNEL)
+	$(MAKE) build-linux-arm64 VERSION=$(VERSION) CHANNEL=$(CHANNEL)
+	$(MAKE) build-darwin-amd64 VERSION=$(VERSION) CHANNEL=$(CHANNEL)
+	$(MAKE) build-darwin-arm64 VERSION=$(VERSION) CHANNEL=$(CHANNEL)
+	@echo "[*] All builds done"
 
 build-staging: go-mod-tidy
 	@echo "[*] Building staging version..."

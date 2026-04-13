@@ -11,4 +11,5 @@ var Kernel = fx.Module(
 	bootstrap.Module,
 	module.Logger,
 	module.Sentry,
+	module.CacheModule,
 )

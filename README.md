@@ -45,6 +45,8 @@ This project includes `@widget.yml` - a Glance widget configuration that display
 - $include: widget.yml
 ```
 
+> **Important:** Do NOT add the `cache` attribute to this widget in your Glance config. The caching is handled directly by the proxy server, not by Glance.
+
 The widget fetches data from the local proxy server (`http://127.0.0.1:8099/`) and displays:
 
 - Number of monitored projects
@@ -73,9 +75,10 @@ curl http://127.0.0.1:8099/
 
 ### Environment Variables
 
-| Variable             | Required | Default     | Description              |
-| -------------------- | -------- | ----------- | ------------------------ |
-| `SENTRY_ORG`         | Yes      | -           | Sentry organization slug |
-| `SENTRY_AUTH_TOKEN`  | Yes      | -           | Sentry API token         |
-| `GLANCE_SENTRY_PORT` | No       | `8099`      | Server binding port      |
-| `GLANCE_SENTRY_HOST` | No       | `127.0.0.1` | Server binding address   |
+| Variable                 | Required | Default     | Description               |
+| ------------------------ | -------- | ----------- | ------------------------- |
+| `SENTRY_ORG`             | Yes      | -           | Sentry organization slug  |
+| `SENTRY_AUTH_TOKEN`      | Yes      | -           | Sentry API token          |
+| `GLANCE_SENTRY_PORT`     | No       | `8099`      | Server binding port       |
+| `GLANCE_SENTRY_HOST`     | No       | `127.0.0.1` | Server binding address    |
+| `CACHE_INTERVAL_MINUTES` | No       | 5           | How often to refresh data |

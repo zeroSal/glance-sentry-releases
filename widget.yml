@@ -1,6 +1,5 @@
 - type: custom-api
   title: Sentry Releases
-  cache: 15m
   url: "http://${GLANCE_SENTRY_HOST}:${GLANCE_SENTRY_PORT}/"
   template: |
     {{ $fetchedAt := .JSON.String "fetchedAt" }}

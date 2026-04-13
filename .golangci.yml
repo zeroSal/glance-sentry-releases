@@ -2,11 +2,12 @@ version: "2"
 linters:
   enable:
     - staticcheck
-  settings:
-    staticcheck:
-      checks:
-        - "all"
-        - "-ST1005"
-        - "-ST1000"
+    - errcheck
+linters-settings:
+  staticcheck:
+    checks:
+      - "all"
+      - "-ST1005"
+      - "-ST1000"
 run:
   allow-parallel-runners: true

@@ -22,7 +22,9 @@ func main() {
 		Use:   "glance-sentry-releases",
 		Short: "Sentry releases proxy with adoption metrics",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				log.Print(err)
+			}
 		},
 	}
 
